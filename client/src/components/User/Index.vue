@@ -12,13 +12,14 @@
         <div><b>status:</b> {{ user.status }}</div>
         <div><b>type:</b> {{ user.type }}</div>
         <div>
-          <button v-on:click="navigateTo('/user/'+user.id)">ดูข้อมูล</button>
-          <button v-on:click="navigateTo('/user/edit/'+user.id)">แก้ไขข้อมูล</button>
+          <button v-on:click="navigateTo('/user/' + user.id)">ดูข้อมูล</button>
+          <button v-on:click="navigateTo('/user/edit/' + user.id)">แก้ไขข้อมูล</button>
           <button v-on:click="deleteUser(user)">ลบข้อมูล</button>
         </div>
         <hr>
       </div>
-      
+      <p><button v-on:click="logout">Logout</button></p>
+
     </div>
 
   </div>
@@ -27,38 +28,45 @@
 <script>
 import UsersService from "@/services/UsersService";
 export default {
-  data(){
+  data() {
     return {
       users: []
     }
   },
   async created() {
-    try{
+    try {
       this.users = (await UsersService.index()).data;
-    }catch(err){
+    } catch (err) {
       console.log(err);
     }
   },
-  methods:{
-    navigateTo(route){
+  methods: {
+    logout() {
+      this.$store.dispatch('setToken', null)
+      this.$store.dispatch('setUser', null)
+      this.$router.push({
+        name: 'login'
+      })
+    },
+    navigateTo(route) {
       this.$router.push(route);
     },
-    async deleteUser(user){
+    async deleteUser(user) {
       let result = confirm("คุณต้องการลบข้อมูลใช่หรือไม่?");
-      if(result){
-        try{
+      if (result) {
+        try {
           await UsersService.delete(user);
           this.refreshData();
 
-        }catch(err){
+        } catch (err) {
           console.log(err);
         }
       }
     },
-    async refreshData(){
-      try{
+    async refreshData() {
+      try {
         this.users = (await UsersService.index()).data;
-      }catch(err){
+      } catch (err) {
         console.log(err);
       }
     }
